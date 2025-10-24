@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alvin Bintang Pratama | Full Stack Developer</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: #0a0a0a;
+      color: #eaeaea;
+      line-height: 1.6;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 20px 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+    .logo {
+      font-size: 24px;
+      color: #00eeff;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .navbar a {
+      text-decoration: none;
+      color: #eaeaea;
+      margin-left: 20px;
+      transition: 0.3s;
+    }
+    .navbar a:hover, .navbar a.active {
+      color: #00eeff;
+    }
+    section {
+      padding: 100px 80px;
+      min-height: 100vh;
+    }
+    .home {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+    }
+    .home-content {
+      max-width: 600px;
+    }
+    .home h3 {
+      font-size: 24px;
+      color: #ccc;
+    }
+    .home h1 {
+      font-size: 48px;
+      color: #00eeff;
+      margin: 10px 0;
+    }
+    .home p {
+      margin: 20px 0;
+      color: #bbb;
+    }
+    .home-sci a {
+      display: inline-block;
+      margin-right: 15px;
+      color: #00eeff;
+      font-size: 24px;
+      transition: 0.3s;
+    }
+    .home-sci a:hover {
+      transform: translateY(-5px);
+      color: #fff;
+    }
+    .btn-box {
+      display: inline-block;
+      padding: 10px 25px;
+      background: #00eeff;
+      color: #000;
+      font-weight: 600;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    .btn-box:hover {
+      background: #00bcd4;
+    }
+    .about {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .about img {
+      width: 280px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 238, 255, 0.2);
+    }
+    .about-text h2 {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+    .about-text span {
+      color: #00eeff;
+    }
+    .services {
+      background: #111;
+      border-top: 1px solid #1c1c1c;
+    }
+    .sub-title {
+      font-size: 36px;
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .sub-title span {
+      color: #00eeff;
+    }
+    .services-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px;
+    }
+    .services-list div {
+      background: #151515;
+      padding: 25px;
+      border-radius: 12px;
+      transition: 0.3s;
+      text-align: center;
+    }
+    .services-list div:hover {
+      background: #0f1a1a;
+      transform: translateY(-5px);
+    }
+    .services-list i {
+      font-size: 40px;
+      color: #00eeff;
+      margin-bottom: 15px;
+    }
+    .portfolio-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+    .portfolio-content .row {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+    .portfolio-content img {
+      width: 100%;
+      display: block;
+      transition: 0.5s;
+    }
+    .portfolio-content .row:hover img {
+      transform: scale(1.1);
+      filter: brightness(0.6);
+    }
+    .portfolio-content .layer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 20px;
+      color: #fff;
+      background: rgba(0, 238, 255, 0.1);
+      transform: translateY(100%);
+      transition: 0.5s;
+    }
+    .portfolio-content .row:hover .layer {
+      transform: translateY(0);
+    }
+    .contact {
+      background: #111;
+      border-top: 1px solid #1c1c1c;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+    }
+    .contact-text {
+      flex: 1;
+      min-width: 280px;
+    }
+    .contact-form {
+      flex: 1;
+      min-width: 280px;
+    }
+    .contact-text h2 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    .contact-text span {
+      color: #00eeff;
+    }
+    .contact-list {
+      list-style: none;
+      margin-top: 20px;
+    }
+    .contact-list li {
+      margin-bottom: 10px;
+      color: #bbb;
+    }
+    .contact-icons a {
+      margin-right: 15px;
+      font-size: 24px;
+      color: #00eeff;
+      transition: 0.3s;
+    }
+    .contact-icons a:hover {
+      color: #fff;
+    }
+    .contact-form input, .contact-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      background: #1a1a1a;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      resize: none;
+    }
+    .contact-form .send {
+      background: #00eeff;
+      color: #000;
+      font-weight: 600;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .contact-form .send:hover {
+      background: #00bcd4;
+    }
+    .last-text {
+      text-align: center;
+      padding: 25px;
+      background: #000;
+      font-size: 14px;
+      color: #777;
+      border-top: 1px solid #111;
+    }
+    .top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #00eeff;
+      color: #000;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 20px;
+      transition: 0.3s;
+    }
+    .top:hover {
+      transform: translateY(-4px);
+      background: #00bcd4;
+    }
+    @media(max-width:768px){
+      header{padding:20px;}
+      section{padding:80px 20px;}
+      .home{flex-direction:column;text-align:center;}
+      .about{flex-direction:column;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="#" class="logo">Alvinprtma</a>
+    <nav class="navbar">
+      <a href="#" class="active">Home</a>
+      <a href="#about">About</a>
+      <a href="#services">Skills</a>
+      <a href="#portfolio">Portfolio</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section class="home">
+    <div class="home-content">
+      <h3>Woiii pukimak, Saya</h3>
+      <h1>Alvin Bintang Pratama</h1>
+      <h3>Saya adalah <span class="text"></span></h3>
+      <p>Saya seorang <b>Full Stack Developer</b> yang gemar membangun pengalaman web yang cepat, modern, dan mudah digunakan. Saya fokus menggunakan <b>JavaScript, Node.js, dan React</b> untuk menciptakan solusi digital yang estetis dan fungsional.</p>
+      <div class="home-sci">
+        <a href="https://www.instagram.com/alvineprtma?igsh=MWV0dnVsYzZmMHQ4ag=="><i class='bx bxl-instagram'></i></a>
+        <a href="https://www.facebook.com/gaming.skak.2025"><i class='bx bxl-facebook'></i></a>
+        <a href="https://www.youtube.com/@alvineprtma"><i class='bx bxl-youtube'></i></a>
+      </div>
+      <a href="#about" class="btn-box">Tentang Saya</a>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <img src="https://img.freepik.com/free-photo/smiling-programmer-working-his-desk-office_1098-18707.jpg" alt="Alvin">
+    <div class="about-text">
+      <h2>Tentang <span>Saya</span></h2>
+      <p>Aku adalah Yin dan tidak akan pernah berubah, apa pun yang terjadi.</p>
+      
+  <section class="services" id="services">
+    <h1 class="sub-title">Keahlian <span>Saya</span></h1>
+    <div class="services-list">
+      <div>
+        <i class='bx bx-code'></i>
+        <h2>Web Development</h2>
+        <p>Membangun website modern dengan performa tinggi, tampilan profesional, dan responsif.</p>
+      </div>
+      <div>
+        <i class='bx bx-paint'></i>
+        <h2>UI/UX Design</h2>
+        <p>Mendesain antarmuka pengguna yang estetis dan mudah digunakan.</p>
+      </div>
+      <div>
+        <i class='bx bx-mobile'></i>
+        <h2>Responsive Design</h2>
+        <p>Memastikan website tampil sempurna di semua ukuran layar dan perangkat.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="portfolio">
+    <div class="main-text">
+      <h2>Proyek <span>Terbaru</span></h2>
+      <div class="portfolio-content">
+        <div class="row">
+          <img src="https://img.freepik.com/free-vector/gradient-colored-ui-kit-collection_23-2149218855.jpg">
+          <div class="layer"><h5>UI/UX Web Design</h5><p>Desain antarmuka modern dengan fokus pada user experience.</p></div>
+        </div>
+        <div class="row">
+          <img src="https://img.freepik.com/free-vector/gradient-dashboard-statistic-evolution-template_23-2148284171.jpg">
+          <div class="layer"><h5>Dashboard System</h5><p>Dashboard analitik realtime berbasis React dan API modern.</p></div>
+        </div>
+        <div class="row">
+          <img src="https://img.freepik.com/free-vector/modern-infographic-element-collection_52683-1777.jpg">
+          <div class="layer"><h5>Microservice API</h5><p>Backend modular dengan Node.js & Express untuk skala besar.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="contact-text">
+      <h2>Hubungi <span>Saya</span></h2>
+      <p>Open Joki Rank Mlbb atau Beli akun Mlbb? Hubungi saya melalui sosial media berikut:</p>
+      <ul class="contact-list">
+        <li><i class="bx bxs-send"></i> alvinebintang123@gmail.com</li>
+        <li><i class="bx bxs-phone"></i> +62 859-5913-3484</li>
+      </ul>
+      <div class="contact-icons">
+        <a href="https://www.instagram.com/alvineprtma?igsh=MWV0dnVsYzZmMHQ4ag=="><i class="bx bxl-instagram"></i></a>
+        <a href="https://www.facebook.com/gaming.skak.2025"><i class="bx bxl-facebook"></i></a>
+        <a href="https://www.youtube.com/@alvineprtma"><i class="bx bxl-youtube"></i></a>
+      </div>
+    </div>
+    <div class="contact-form">
+      <form>
+        <input type="text" placeholder="Masukkan Nama Anda" required>
+        <input type="email" placeholder="Masukkan Email Anda" required>
+        <textarea placeholder="Tulis Pesan Anda" required></textarea>
+        <input type="submit" value="Kirim" class="send">
+      </form>
+    </div>
+  </section>
+
+  <div class="last-text">
+    <p>© 2025 | Dibuat oleh <b>Alvin Bintang Pratama</b></p>
+  </div>
+
+  <a href="#" class="top"><i class='bx bx-up-arrow-alt'></i></a>
+
+  <script>
+    const words = ["Full Stack Developer", "Web Designer", "Freelancer"];
+    let i = 0, j = 0, currentWord = "", isDeleting = false;
+    function typeEffect() {
+      const textEl = document.querySelector(".text");
+      if (isDeleting) {
+        currentWord = words[i].substring(0, j--);
+      } else {
+        currentWord = words[i].substring(0, j++);
+      }
+      textEl.textContent = currentWord;
+      if (!isDeleting && j === words[i].length) {
+        isDeleting = true;
+        setTimeout(typeEffect, 1500);
+        return;
+      } else if (isDeleting && j === 0) {
+        isDeleting = false;
+        i = (i + 1) % words.length;
+      }
+      setTimeout(typeEffect, isDeleting ? 80 : 120);
+    }
+    document.addEventListener("DOMContentLoaded", typeEffect);
+  </script>
+</body>
+</html>
