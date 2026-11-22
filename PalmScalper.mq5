@@ -12,9 +12,12 @@
 //| trade is locked so it can never turn red. Lot compounds gently   |
 //| with realised balance growth, hard-capped. One position at a     |
 //| time, every position carries an SL.                              |
+//| v2.01: immediate entry on attach (owner's "bot aktif" rule) —    |
+//| the first position opens at once in the D1 gate's direction      |
+//| (trend-score direction as fallback), still under every guard.    |
 //+------------------------------------------------------------------+
 #property copyright "ticol"
-#property version   "2.00"
+#property version   "2.01"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -40,6 +43,7 @@ input double InpMaxLot          = 0.20;   // Hard cap on the compounded lot
 input long   InpMagic           = 4249201;// Magic number
 input string InpNewsTimes       = "";     // Server-time news to avoid, e.g. "15:30,21:00" (HH:MM, comma separated)
 input int    InpNewsAvoidMin    = 30;     // Minutes before/after news time to stay out
+input bool   InpImmediateEntry  = true;   // v2.01: on attach, enter at once in the D1 gate's direction (owner's "bot aktif" rule)
 
 //---------------- Inputs: trend score + D1 gate (v2.00) ----------------
 input int    InpMinScore        = 7;      // Minimum |trend score| (0-10) to enter
@@ -68,6 +72,7 @@ double StartEquity;  // equity when the EA started (hard-stop baseline)
 datetime LastBarTime; // last M5 bar seen (entries + streak refresh run on new bars)
 ulong  PosTicketSeen; // ticket of the position currently being checkpoint-tracked
 int    PosCheckpoint; // highest $-checkpoint reached by the current position
+bool   ImmediateDone; // v2.01: the immediate-entry attempt for this attach has run
 string GVStreak, GVPaper, GVHalt, GVPapDir, GVPapPrice, GVPapTime;
 
 //+------------------------------------------------------------------+
@@ -432,6 +437,7 @@ int OnInit()
    RefreshDayStats();
    LastBarTime = iTime(_Symbol, PERIOD_M5, 0);
    PosTicketSeen = 0; PosCheckpoint = 0;
+   ImmediateDone = false;
    return INIT_SUCCEEDED;
 }
 
@@ -494,7 +500,7 @@ void OnTick()
    // ---- Dashboard ----
    double dayPnL = AccountInfoDouble(ACCOUNT_BALANCE) - DayPnLBase;
    bool profitLocked = (InpDailyProfitLock > 0 && dayPnL >= InpDailyProfitLock);
-   Comment(StringFormat("PalmScalper v2.00 | %s M5 | %s\nSpread: %.1f pips | Score: %+d | D1 gate: %s\nTrades today: %d/%d | Day P/L: $%.2f (limit -$%.2f, lock +$%.2f%s)\nLot now: %.2f | Streak: %d%s%s%s\nQualifying today: %d / 10 target",
+   Comment(StringFormat("PalmScalper v2.01 | %s M5 | %s\nSpread: %.1f pips | Score: %+d | D1 gate: %s\nTrades today: %d/%d | Day P/L: $%.2f (limit -$%.2f, lock +$%.2f%s)\nLot now: %.2f | Streak: %d%s%s%s\nQualifying today: %d / 10 target",
                         _Symbol, paper ? "PAPER" : "LIVE", spreadPips, score,
                         gate > 0 ? "LONG" : (gate < 0 ? "SHORT" : "FLAT"),
                         TradesToday, InpMaxTradesPerDay,
@@ -579,6 +585,58 @@ void OnTick()
          }
       }
       return; // one position at a time
+   }
+
+   // ---- Immediate entry on activation (v2.01) ----
+   // Owner's rule: "bot aktif" means a position opens at once, not
+   // after waiting for a full signal. Direction still comes from the
+   // analysis — the D1 gate first, the trend score as fallback —
+   // and every guard (halt, paper, streak cooldown, day limits,
+   // spread cap, news window) still applies. One attempt per attach;
+   // the position is a normal PalmScalper position (own magic), so
+   // the checkpoint exits and blue-guard trailing manage it as usual.
+   if(InpImmediateEntry && !ImmediateDone)
+   {
+      ImmediateDone = true;
+      if(!paper && !halted && !streakCooldown && TradesToday < InpMaxTradesPerDay &&
+         dayPnL > -InpDailyLossLimit && !profitLocked &&
+         spreadPips <= InpMaxSpreadPips && !InNewsWindow())
+      {
+         int dir = gate;
+         if(dir == 0 && MathAbs(score) >= 3) dir = (score > 0) ? 1 : -1;
+         if(dir != 0)
+         {
+            double slDistI = InpStopLossPips * PipValue;
+            double tpDistI = InpSafetyTPPips * PipValue;
+            double lotI = EffectiveLot();
+            bool okI = false;
+            if(dir > 0)
+            {
+               double slI = NormalizeDouble(tick.ask - slDistI, _Digits);
+               double tpI = (InpSafetyTPPips > 0) ? NormalizeDouble(tick.ask + tpDistI, _Digits) : 0;
+               okI = trade.Buy(lotI, _Symbol, tick.ask, slI, tpI, "PalmScalper immediate buy");
+            }
+            else
+            {
+               double slI = NormalizeDouble(tick.bid + slDistI, _Digits);
+               double tpI = (InpSafetyTPPips > 0) ? NormalizeDouble(tick.bid - tpDistI, _Digits) : 0;
+               okI = trade.Sell(lotI, _Symbol, tick.bid, slI, tpI, "PalmScalper immediate sell");
+            }
+            if(okI)
+            {
+               TradesToday++;
+               PrintFormat("PalmScalper: IMMEDIATE entry %s (gate %+d, score %+d)",
+                           dir > 0 ? "BUY" : "SELL", gate, score);
+            }
+            else
+               PrintFormat("PalmScalper: immediate entry order failed: %s", trade.ResultRetcodeDescription());
+         }
+         else
+            Print("PalmScalper: immediate entry skipped — no direction (D1 gate flat, score weak)");
+      }
+      else
+         Print("PalmScalper: immediate entry skipped — a guard is active");
+      return; // the attempt consumes this tick either way
    }
 
    // ---- Paper mode: track virtual trades, never send real orders ----
