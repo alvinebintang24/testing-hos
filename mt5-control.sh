@@ -29,10 +29,10 @@ find_data_dir() {
 terminal_log_tail() {
   local data_dir="$1"
   local f
-  f=$(ls -t "$data_dir/Logs/"*.log 2>/dev/null | head -1)
+  f=$(ls -t "$data_dir/"[Ll]ogs/*.log 2>/dev/null | head -1)
   [ -n "${f:-}" ] && iconv -f UTF-16LE -t UTF-8 "$f" 2>/dev/null | tail -30
   local m
-  m=$(ls -t "$data_dir/MQL5/Logs/"*.log 2>/dev/null | head -1)
+  m=$(ls -t "$data_dir/MQL5/"[Ll]ogs/*.log 2>/dev/null | head -1)
   if [ -n "${m:-}" ]; then
     echo "--- MQL5 log ---"
     iconv -f UTF-16LE -t UTF-8 "$m" 2>/dev/null | tail -30
