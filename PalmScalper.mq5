@@ -18,9 +18,12 @@
 //| v2.02: profit kill switch (owner's rule) — at +$50 total profit  |
 //| the EA closes every position, banks the win and removes itself.  |
 //| A PS_RESET.flag file (dropped on a fresh "bot aktif") revives it.|
+//| v2.03: bank-and-pile exits (owner's rule) — a position whose      |
+//| profit reaches the $5 checkpoint is closed at once (once the     |
+//| bonus hold/move rules qualify); no riding winners back down.     |
 //+------------------------------------------------------------------+
 #property copyright "ticol"
-#property version   "2.02"
+#property version   "2.03"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -36,7 +39,7 @@ input int    InpMinHoldSeconds  = 180;    // Minimum hold before a signal-exit (
 input double InpMinMovePips     = 5.0;    // Minimum price move for a signal-exit (bonus rule)
 input int    InpMaxTradesPerDay = 3;      // Max entries per day
 input double InpDailyLossLimit  = 15.0;   // Stop trading for the day after this loss ($)
-input double InpDailyProfitLock = 10.0;   // Lock the day's profit: stop opening trades once day P/L reaches this ($) — 0 = off
+input double InpDailyProfitLock = 0.0;    // Daily profit lock — OFF since v2.03 (accumulation toward the $50 kill target is not capped per day); the daily LOSS limit still guards
 input double InpTrailStartPips  = 5.0;    // Blue-guard: once profit reaches this (pips) after min hold, SL locks it in — 0 = off
 input double InpTrailDistancePips = 3.0;  // Trailing distance behind price once the blue-guard is armed (pips)
 input int    InpReenterCooldownSec = 60;  // Wait this long after a close before re-entering (s)
@@ -444,7 +447,7 @@ int OnInit()
       FileDelete("PS_RESET.flag");
       GlobalVariableSet(GVKill, 0);
       GlobalVariableSet(GVBaseEq, AccountInfoDouble(ACCOUNT_EQUITY));
-      Print("PalmScalper v2.02: reset flag found — kill switch cleared, profit baseline re-set to current equity");
+      Print("PalmScalper v2.03: reset flag found — kill switch cleared, profit baseline re-set to current equity");
    }
    if(!GlobalVariableCheck(GVBaseEq))
       GlobalVariableSet(GVBaseEq, AccountInfoDouble(ACCOUNT_EQUITY));
@@ -547,7 +550,7 @@ void OnTick()
    // ---- Dashboard ----
    double dayPnL = AccountInfoDouble(ACCOUNT_BALANCE) - DayPnLBase;
    bool profitLocked = (InpDailyProfitLock > 0 && dayPnL >= InpDailyProfitLock);
-   Comment(StringFormat("PalmScalper v2.02 | %s M5 | %s\nSpread: %.1f pips | Score: %+d | D1 gate: %s\nTrades today: %d/%d | Day P/L: $%.2f (limit -$%.2f, lock +$%.2f%s)\nLot now: %.2f | Streak: %d%s%s%s\nQualifying today: %d / 10 target",
+   Comment(StringFormat("PalmScalper v2.03 | %s M5 | %s\nSpread: %.1f pips | Score: %+d | D1 gate: %s\nTrades today: %d/%d | Day P/L: $%.2f (limit -$%.2f, lock +$%.2f%s)\nLot now: %.2f | Streak: %d%s%s%s\nQualifying today: %d / 10 target",
                         _Symbol, paper ? "PAPER" : "LIVE", spreadPips, score,
                         gate > 0 ? "LONG" : (gate < 0 ? "SHORT" : "FLAT"),
                         TradesToday, InpMaxTradesPerDay,
@@ -611,25 +614,16 @@ void OnTick()
          return;
       }
 
-      // Profit checkpoints: each new $ step re-checks the score. Agree ->
-      // the blue-guard keeps locking and we ride; turned -> close, but
-      // only once the close still satisfies the bonus hold/move rules.
-      if(InpCheckpointUsd > 0 && profit > 0)
+      // v2.03 owner rule ("posisi profit langsung tarik"): once the
+      // floating profit reaches the checkpoint AND the close satisfies
+      // the bonus hold/move rules, bank it immediately — profits are
+      // pulled one by one and piled toward the $50 kill target.
+      if(InpCheckpointUsd > 0 && profit >= InpCheckpointUsd &&
+         heldLongEnough && MathAbs(movePips) >= InpMinMovePips)
       {
-         int ckpt = (int)MathFloor(profit / InpCheckpointUsd);
-         if(ckpt > PosCheckpoint)
-         {
-            PosCheckpoint = ckpt;
-            int aligned = dirSign * score;
-            PrintFormat("PalmScalper: checkpoint $%d reached (profit $%.2f, aligned score %d)",
-                        ckpt * (int)InpCheckpointUsd, profit, aligned);
-            if(aligned < InpScoreAgree && heldLongEnough && MathAbs(movePips) >= InpMinMovePips)
-            {
-               Print("PalmScalper: score no longer agrees at checkpoint — closing");
-               trade.PositionClose(posTicket);
-               return;
-            }
-         }
+         PrintFormat("PalmScalper: profit $%.2f reached — pulling it now (bank-and-pile)", profit);
+         trade.PositionClose(posTicket);
+         return;
       }
       return; // one position at a time
    }
