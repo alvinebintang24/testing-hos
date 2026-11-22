@@ -85,8 +85,19 @@ do_attach() {
   else
     log "ATTACH $which: PalmScalper.ex5 not found in old prefix"
   fi
+  # a fresh "bot aktif" revives the EA even after its profit kill switch fired
+  mkdir -p "$dst_data/MQL5/Files"
+  : > "$dst_data/MQL5/Files/PS_RESET.flag"
+  log "reset flag dropped for $which"
   launch_with_config "$prefix" "$exe" "$dst_data"
   sleep 25
+  do_status
+}
+
+do_stop() {
+  pkill -f "terminal64.exe" 2>/dev/null
+  sleep 2
+  log "STOP: all MT5 terminals killed (bot mati)"
   do_status
 }
 
@@ -107,6 +118,7 @@ run_cmd() {
     ATTACH_OLD) do_attach old ;;
     ATTACH_BRANDED) do_attach branded ;;
     RESTART_VNC) do_vnc ;;
+    STOP) do_stop ;;
     WAIT|"") : ;;
     *) log "unknown command: $cmd" ;;
   esac
