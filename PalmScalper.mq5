@@ -404,7 +404,7 @@ void PaperOnTick(const MqlTick &tick, int score, int gate)
       return;
    }
    // no virtual position: would we enter here? (same signal as live)
-   if(gate != 0 && MathAbs(score) >= InpMinScore && MathSign((double)score) == gate)
+   if(gate != 0 && MathAbs(score) >= InpMinScore && (score > 0 ? 1 : (score < 0 ? -1 : 0)) == gate)
    {
       int vdir = (score > 0) ? 1 : -1;
       double vprice = (vdir > 0) ? tick.ask : tick.bid;
@@ -661,7 +661,7 @@ void OnTick()
    // ---- Entry signal: score fires in the D1 gate's direction ----
    if(gate == 0) return;
    if(MathAbs(score) < InpMinScore) return;
-   if(MathSign((double)score) != gate) return;
+   if((score > 0 ? 1 : (score < 0 ? -1 : 0)) != gate) return;
 
    double rsiBuf[];
    if(CopyBuffer(hRSI, 0, 1, 1, rsiBuf) < 1) return;
