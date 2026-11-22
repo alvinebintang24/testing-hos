@@ -16,10 +16,14 @@ export DISPLAY=:99
 log() { echo "[$(date '+%H:%M:%S')] $*" >> "$LOG_FILE"; }
 
 find_data_dir() {
-  # $1 = wine prefix; prints the MetaQuotes Terminal data dir (contains MQL5)
-  local prefix="$1"
-  find "$prefix/drive_c" -type d -path "*MetaQuotes/Terminal/*" -name "MQL5" 2>/dev/null \
-    | head -1 | sed 's|/MQL5$||'
+  # $1 = wine prefix; prints the terminal's data dir (the parent of MQL5).
+  # Layout varies: AppData profile dir OR the install folder itself
+  # (portable-style). Prefer a candidate that also has a Logs sibling.
+  local prefix="$1" cand
+  while IFS= read -r cand; do
+    if [ -d "$cand/Logs" ]; then echo "$cand"; return; fi
+  done < <(find "$prefix/drive_c" -type d -name "MQL5" 2>/dev/null | sed 's|/MQL5$||')
+  find "$prefix/drive_c" -type d -name "MQL5" 2>/dev/null | head -1 | sed 's|/MQL5$||'
 }
 
 terminal_log_tail() {
@@ -61,7 +65,7 @@ launch_with_config() {
   local ini="$data_dir/config/startup.ini"
   mkdir -p "$data_dir/config"
   printf '[StartUp]\nSymbol=BTCUSD\nPeriod=M5\nExpert=PalmScalper\n' > "$ini"
-  pkill -f "$exe" 2>/dev/null; sleep 3
+  pkill -f "terminal64.exe" 2>/dev/null; sleep 3
   WINEPREFIX="$prefix" nohup wine "$prefix/drive_c/$exe" "/config:Z:${ini//\//\\}" >/dev/null 2>&1 &
   log "launched $exe with $ini"
 }
