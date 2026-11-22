@@ -37,20 +37,38 @@ jobs:
           "TERM_DIR=$($term.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
           Write-Host "TERM_DIR=$($term.FullName)"
 
-      - name: First launch to populate data folder
+      - name: First launch with startup config (populate + login)
         shell: pwsh
+        env:
+          MT5_LOGIN: ${{ secrets.MT5_LOGIN }}
+          MT5_PASSWORD: ${{ secrets.MT5_PASSWORD }}
         run: |
+          if (-not $env:MT5_LOGIN -or -not $env:MT5_PASSWORD) { throw "MT5_LOGIN / MT5_PASSWORD secrets are not set" }
+          $base = Join-Path $env:APPDATA "MetaQuotes\Terminal"
+          New-Item -ItemType Directory -Force -Path $base | Out-Null
           $termExe = Join-Path $env:TERM_DIR "terminal64.exe"
+          # Pre-create the data folder is not possible (hash dir is made by the terminal),
+          # so do a virgin first launch to create it, then write the ini into it.
           Start-Process -FilePath $termExe
-          Start-Sleep -Seconds 30
+          Start-Sleep -Seconds 25
           Get-Process terminal64 -ErrorAction SilentlyContinue | Stop-Process -Force
           Start-Sleep -Seconds 3
-          $base = Join-Path $env:APPDATA "MetaQuotes\Terminal"
           $data = Get-ChildItem $base -Directory | Where-Object { Test-Path (Join-Path $_.FullName "MQL5") } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
           if (-not $data) { throw "terminal data folder not found under $base" }
           "DATA_DIR=$($data.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
           Write-Host "DATA_DIR=$($data.FullName)"
-          Get-ChildItem (Join-Path $data.FullName "MQL5") | Select-Object Name
+          $cfgDir = Join-Path $data.FullName "config"
+          New-Item -ItemType Directory -Force -Path $cfgDir | Out-Null
+          $ini = Join-Path $cfgDir "startup.ini"
+          $lines = @("[StartUp]", "Login=$env:MT5_LOGIN", "Password=$env:MT5_PASSWORD", "Server=TradeSetGo-LiveTrade", "Symbol=${{ inputs.symbol }}", "Period=M5", "Expert=PalmScalper")
+          [System.IO.File]::WriteAllLines($ini, $lines, [System.Text.Encoding]::ASCII)
+          Write-Host "startup.ini written to $ini"
+          Start-Process -FilePath $termExe -ArgumentList "/config:`"$ini`""
+          Start-Sleep -Seconds 45
+          $logf = Get-ChildItem (Join-Path $data.FullName "Logs") -Filter "*.log" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if ($logf) { Write-Host "===== TERMINAL LOG AFTER FIRST CONFIG LAUNCH ====="; Get-Content $logf.FullName }
+          Get-Process terminal64 -ErrorAction SilentlyContinue | Stop-Process -Force
+          Start-Sleep -Seconds 3
 
       - name: Place EA source and compile
         shell: pwsh
@@ -69,28 +87,26 @@ jobs:
           if (-not (Test-Path $ex5)) { throw "PalmScalper.ex5 was not produced" }
           Get-Item $ex5 | Select-Object Length
 
-      - name: Write startup config and launch terminal
+      - name: Launch terminal with EA
         shell: pwsh
-        env:
-          MT5_LOGIN: ${{ secrets.MT5_LOGIN }}
-          MT5_PASSWORD: ${{ secrets.MT5_PASSWORD }}
         run: |
-          if (-not $env:MT5_LOGIN -or -not $env:MT5_PASSWORD) { throw "MT5_LOGIN / MT5_PASSWORD secrets are not set" }
-          $cfgDir = Join-Path $env:DATA_DIR "config"
-          New-Item -ItemType Directory -Force -Path $cfgDir | Out-Null
-          $ini = Join-Path $cfgDir "startup.ini"
-          @"
-          [StartUp]
-          Login=$env:MT5_LOGIN
-          Password=$env:MT5_PASSWORD
-          Server=TradeSetGo-LiveTrade
-          Symbol=${{ inputs.symbol }}
-          Period=M5
-          Expert=PalmScalper
-          "@ | Out-File -FilePath $ini -Encoding ascii
+          $ini = Join-Path $env:DATA_DIR "config\startup.ini"
           $termExe = Join-Path $env:TERM_DIR "terminal64.exe"
           Start-Process -FilePath $termExe -ArgumentList "/config:`"$ini`""
           Write-Host "terminal launched at $(Get-Date -Format o)"
+
+      - name: Verify login and EA (dump logs)
+        shell: pwsh
+        run: |
+          Start-Sleep -Seconds 75
+          Write-Host "===== TERMINAL LOG (tail) ====="
+          $logf = Get-ChildItem (Join-Path $env:DATA_DIR "Logs") -Filter "*.log" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if ($logf) { Get-Content $logf.FullName -Tail 60 }
+          Write-Host "===== MQL5 LOG (tail) ====="
+          $mlog = Get-ChildItem (Join-Path $env:DATA_DIR "MQL5\Logs") -Filter "*.log" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if ($mlog) { Get-Content $mlog.FullName -Tail 60 } else { Write-Host "no MQL5 log file yet" }
+          $auth = Select-String -Path $logf.FullName -Pattern "authorized" -Quiet
+          Write-Host "LOGIN_AUTHORIZED=$auth"
 
       - name: Keep alive and stream logs
         shell: pwsh
