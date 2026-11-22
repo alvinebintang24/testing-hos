@@ -1,3 +1,8 @@
 [09:18:48] mt5-control started in /workspaces/testing-hos
 [09:18:49] executing: ATTACH_OLD
 [09:18:49] ATTACH old: data dir not found
+[09:35:06] mt5-control started in /workspaces/testing-hos
+[09:35:06] executing: ATTACH_OLD
+[09:35:06] EA copied to old Experts
+[09:35:06] reset flag dropped for old
+[09:35:09] launched Program Files/MetaTrader 5/terminal64.exe with /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5/config/startup.ini
