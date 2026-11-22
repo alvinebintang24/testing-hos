@@ -1,0 +1,108 @@
+name: mt5-bot
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: "Chart symbol for the EA"
+        required: true
+        default: "BTCUSD"
+      minutes:
+        description: "How long to keep the terminal running (max 350)"
+        required: true
+        default: "350"
+
+jobs:
+  trade:
+    runs-on: windows-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download TradeSetGo MT5 installer
+        shell: pwsh
+        run: |
+          $url = "https://download.terminal.free/cdn/web/24980/mt5/tradesetgo5setup.exe"
+          Invoke-WebRequest -Uri $url -OutFile "$env:RUNNER_TEMP\tradesetgo5setup.exe"
+          Get-Item "$env:RUNNER_TEMP\tradesetgo5setup.exe" | Select-Object Length
+
+      - name: Install MT5 unattended
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath "$env:RUNNER_TEMP\tradesetgo5setup.exe" -ArgumentList "/auto" -PassThru
+          if (-not $p.WaitForExit(420000)) { $p.Kill(); throw "installer timeout" }
+          Start-Sleep -Seconds 10
+          $term = Get-ChildItem "C:\Program Files" -Directory | Where-Object { $_.Name -like "*Trade Set Go*" } | Select-Object -First 1
+          if (-not $term) { throw "MT5 install dir not found under Program Files" }
+          "TERM_DIR=$($term.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "TERM_DIR=$($term.FullName)"
+          Get-ChildItem $term.FullName | Select-Object Name
+
+      - name: Place EA source and compile
+        shell: pwsh
+        run: |
+          $experts = Join-Path $env:TERM_DIR "MQL5\Experts"
+          New-Item -ItemType Directory -Force -Path $experts | Out-Null
+          Copy-Item ".\PalmScalper.mq5" (Join-Path $experts "PalmScalper.mq5") -Force
+          $me = Join-Path $env:TERM_DIR "metaeditor64.exe"
+          $src = Join-Path $experts "PalmScalper.mq5"
+          $log = Join-Path $experts "compile.log"
+          $p = Start-Process -FilePath $me -ArgumentList "/compile:`"$src`"", "/log:`"$log`"" -PassThru
+          if (-not $p.WaitForExit(180000)) { $p.Kill(); throw "compile timeout" }
+          Start-Sleep -Seconds 3
+          if (Test-Path $log) { Get-Content $log }
+          $ex5 = Join-Path $experts "PalmScalper.ex5"
+          if (-not (Test-Path $ex5)) { throw "PalmScalper.ex5 was not produced" }
+          Get-Item $ex5 | Select-Object Length
+
+      - name: Write startup config and launch terminal
+        shell: pwsh
+        env:
+          MT5_LOGIN: ${{ secrets.MT5_LOGIN }}
+          MT5_PASSWORD: ${{ secrets.MT5_PASSWORD }}
+        run: |
+          if (-not $env:MT5_LOGIN -or -not $env:MT5_PASSWORD) { throw "MT5_LOGIN / MT5_PASSWORD secrets are not set" }
+          $cfgDir = Join-Path $env:TERM_DIR "config"
+          New-Item -ItemType Directory -Force -Path $cfgDir | Out-Null
+          $ini = Join-Path $cfgDir "startup.ini"
+          @"
+          [StartUp]
+          Login=$env:MT5_LOGIN
+          Password=$env:MT5_PASSWORD
+          Server=TradeSetGo-LiveTrade
+          Symbol=${{ inputs.symbol }}
+          Period=M5
+          Expert=PalmScalper
+          "@ | Out-File -FilePath $ini -Encoding ascii
+          $termExe = Join-Path $env:TERM_DIR "terminal64.exe"
+          Start-Process -FilePath $termExe -ArgumentList "/portable", "/config:`"$ini`""
+          Write-Host "terminal launched at $(Get-Date -Format o)"
+
+      - name: Keep alive and stream logs
+        shell: pwsh
+        run: |
+          $mins = [int]"${{ inputs.minutes }}"
+          $deadline = (Get-Date).AddMinutes($mins)
+          $i = 0
+          while ((Get-Date) -lt $deadline) {
+            Start-Sleep -Seconds 300
+            $i++
+            $stamp = Get-Date -Format "HHmmss"
+            $out = Join-Path $env:RUNNER_TEMP "snap-$stamp"
+            New-Item -ItemType Directory -Force -Path $out | Out-Null
+            $logs = Join-Path $env:TERM_DIR "Logs"
+            $mlogs = Join-Path $env:TERM_DIR "MQL5\Logs"
+            if (Test-Path $logs) { Copy-Item $logs (Join-Path $out "Logs") -Recurse -Force -ErrorAction SilentlyContinue }
+            if (Test-Path $mlogs) { Copy-Item $mlogs (Join-Path $out "MQL5Logs") -Recurse -Force -ErrorAction SilentlyContinue }
+            Write-Host "snapshot $i at $stamp"
+          }
+
+      - name: Upload terminal logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mt5-logs
+          path: |
+            ${{ env.TERM_DIR }}\Logs
+            ${{ env.TERM_DIR }}\MQL5\Logs
+          if-no-files-found: warn
