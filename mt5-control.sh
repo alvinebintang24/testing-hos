@@ -30,12 +30,12 @@ terminal_log_tail() {
   local data_dir="$1"
   local f
   f=$(ls -t "$data_dir/Logs/"*.log 2>/dev/null | head -1)
-  [ -n "${f:-}" ] && tail -25 "$f" 2>/dev/null | iconv -f UTF-16LE -t UTF-8 2>/dev/null | tail -25
+  [ -n "${f:-}" ] && iconv -f UTF-16LE -t UTF-8 "$f" 2>/dev/null | tail -30
   local m
   m=$(ls -t "$data_dir/MQL5/Logs/"*.log 2>/dev/null | head -1)
   if [ -n "${m:-}" ]; then
     echo "--- MQL5 log ---"
-    tail -25 "$m" 2>/dev/null | iconv -f UTF-16LE -t UTF-8 2>/dev/null | tail -25
+    iconv -f UTF-16LE -t UTF-8 "$m" 2>/dev/null | tail -30
   fi
 }
 
