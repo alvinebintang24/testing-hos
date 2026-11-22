@@ -1,0 +1,4 @@
+{
+  "name": "mt5-host",
+  "postStartCommand": "bash mt5-boot.sh && (pgrep -f mt5-watchdog.sh >/dev/null || (nohup bash mt5-watchdog.sh >/tmp/mt5-watchdog-main.log 2>&1 &))"
+}
