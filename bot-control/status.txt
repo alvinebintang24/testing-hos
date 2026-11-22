@@ -1,13 +1,60 @@
-STATUS 2026-11-22 09:41:46 UTC
+STATUS 2026-11-22 09:51:01 UTC
 == processes ==
 codespa+  181123  0.0  0.2  62028 37648 pts/0    S    08:41   0:00 /usr/bin/python3 /usr/bin/websockify --web=/usr/share/novnc/ 6080 localhost:5900
-codespa+  214203  0.0  0.0 2684536 14304 pts/3   S    09:35   0:00 start.exe /exec /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5/terminal64.exe
-codespa+  214207  5.2  1.5 14939524 250852 pts/3 Sl   09:35   0:20 C:\Program Files\MetaTrader 5\terminal64.exe /config:Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini
+codespa+  222856  0.0  0.0 2684540 14348 pts/3   S    09:47   0:00 start.exe /exec /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5/terminal64.exe
+codespa+  222868  6.4  1.5 14809088 251240 pts/3 Sl   09:47   0:13 C:\Program Files\MetaTrader 5\terminal64.exe /config:Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini
 == listeners ==
 LISTEN 0      100          0.0.0.0:6080       0.0.0.0:*    users:(("python3",pid=181123,fd=3))    
 LISTEN 0      5            0.0.0.0:5900       0.0.0.0:*    users:(("Xtigervnc",pid=198671,fd=9))  
 LISTEN 0      5               [::]:5900          [::]:*    users:(("Xtigervnc",pid=198671,fd=10)) 
 == prefix /home/codespace/.mt5w ==
 data_dir: /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5
+HH	0	09:15:10.861	Network	'42492': authorized on TradeSetGo-LiveTrade through Access Server LON2
+HS	0	09:15:10.861	Network	'42492': previous successful authorization performed from 82.158.131.25 on 2026.11.22 11:14:44
+KS	0	09:15:11.162	Network	'42492': terminal synchronized with Trade Set Go Ltd: 0 positions, 0 orders, 525 symbols, 0 spreads
+IP	0	09:15:11.162	Network	'42492': trading has been enabled - hedging mode
+KF	0	09:15:11.162	Network	'42492': balance management has been enabled
+RR	0	09:35:11.215	Startup	successfully initialized from start config "Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini"
+GE	0	09:35:11.407	Terminal	MetaTrader 5 x64 build 6328 started for MetaQuotes Ltd.
+QL	0	09:35:11.408	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 13 / 15 Gb memory, 4 / 31 Gb disk, GMT+0
+EF	0	09:35:11.408	Terminal	C:\Program Files\MetaTrader 5
+HQ	0	09:35:11.408	Terminal	launched with Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini
+PG	0	09:35:11.427	MCP	started on 127.0.0.1:22346
+LQ	0	09:35:11.475	Compiler	full recompilation has been started
+FH	0	09:35:11.985	Compiler	full recompilation has been finished:  0 file(s) compiled
+IF	0	09:35:17.153	Experts	expert PalmScalper (BTCUSD,M5) loaded successfully
+RL	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud Asia 2: 10 gbit" found
+FE	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud USA 1: 10 gbit" found
+NP	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud Europe 2: 10 gbit" found
+IQ	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud USA 2: 10 gbit" found
+GD	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud Asia 1: 1 gbit" found
+CM	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud Europe 3: 10 gbit" found
+GK	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud Europe 1: 10 gbit" found
+DR	2	09:40:27.177	Experts	initializing of PalmScalper (BTCUSD,M5) failed with code 0 (symbol synchronization timeout)
+DL	0	09:40:27.182	Experts	expert PalmScalper (BTCUSD,M5) removed
+QJ	0	09:47:39.510	Startup	successfully initialized from start config "Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini"
+QN	0	09:47:39.714	Terminal	MetaTrader 5 x64 build 6328 started for MetaQuotes Ltd.
+NE	0	09:47:39.714	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 13 / 15 Gb memory, 4 / 31 Gb disk, GMT+0
+RO	0	09:47:39.714	Terminal	C:\Program Files\MetaTrader 5
+CN	0	09:47:39.714	Terminal	launched with Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini
+JN	0	09:47:39.734	MCP	started on 127.0.0.1:22346
+PK	0	09:47:45.622	Experts	expert PalmScalper (BTCUSD,M5) loaded successfully
+--- MQL5 log ---
+﻿FQ	0	07:31:00.897	PalmScalper (BTCUSD.,M5)	PalmScalper: immediate entry skipped — a guard is active
+KK	0	08:23:58.731	Experts	automated trading is disabled
 == prefix /home/codespace/.mt5t ==
 data_dir: /home/codespace/.mt5t/drive_c/Program Files/Trade Set Go MT5 Terminal
+﻿RP	0	08:14:46.092	Terminal	shutdown with 0
+CR	0	08:15:05.337	Terminal	updating C:\Program Files\Trade Set Go MT5 Terminal\MQL5 folder
+PQ	0	08:15:05.337	Terminal	453 files updated
+JS	0	08:15:05.619	Terminal	Trade Set Go MT5 Terminal x64 build 6328 started for Trade Set Go Ltd
+FR	0	08:15:05.620	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 12 / 15 Gb memory, 4 / 31 Gb disk, GMT+0
+MS	0	08:15:05.620	Terminal	C:\Program Files\Trade Set Go MT5 Terminal
+DP	3	08:15:05.633	MCP	bind error on 127.0.0.1:22346 [ (10048)]
+MD	0	08:15:05.685	Compiler	full recompilation has been started
+KM	0	08:16:08.369	Compiler	full recompilation has been finished:  131 file(s) compiled
+PI	0	08:20:55.354	Broker	TradeSetGo-LiveTrade: no demo/preliminary groups on server side
+PS	0	09:17:07.023	Terminal	Trade Set Go MT5 Terminal x64 build 6328 started for Trade Set Go Ltd
+OS	0	09:17:07.024	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 12 / 15 Gb memory, 4 / 31 Gb disk, GMT+0
+HS	0	09:17:07.024	Terminal	C:\Program Files\Trade Set Go MT5 Terminal
+IP	3	09:17:07.040	MCP	bind error on 127.0.0.1:22346 [ (10048)]
