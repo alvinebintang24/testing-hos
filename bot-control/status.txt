@@ -1,8 +1,8 @@
-STATUS 2026-11-22 09:35:34 UTC
+STATUS 2026-11-22 09:41:46 UTC
 == processes ==
 codespa+  181123  0.0  0.2  62028 37648 pts/0    S    08:41   0:00 /usr/bin/python3 /usr/bin/websockify --web=/usr/share/novnc/ 6080 localhost:5900
-codespa+  214203  0.5  0.0 2684536 14304 pts/3   S    09:35   0:00 start.exe /exec /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5/terminal64.exe
-codespa+  214207 23.1  1.5 14939524 251000 pts/3 Sl   09:35   0:05 C:\Program Files\MetaTrader 5\terminal64.exe /config:Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini
+codespa+  214203  0.0  0.0 2684536 14304 pts/3   S    09:35   0:00 start.exe /exec /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5/terminal64.exe
+codespa+  214207  5.2  1.5 14939524 250852 pts/3 Sl   09:35   0:20 C:\Program Files\MetaTrader 5\terminal64.exe /config:Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini
 == listeners ==
 LISTEN 0      100          0.0.0.0:6080       0.0.0.0:*    users:(("python3",pid=181123,fd=3))    
 LISTEN 0      5            0.0.0.0:5900       0.0.0.0:*    users:(("Xtigervnc",pid=198671,fd=9))  
