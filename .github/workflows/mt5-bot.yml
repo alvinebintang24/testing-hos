@@ -36,12 +36,26 @@ jobs:
           if (-not $term) { throw "MT5 install dir not found under Program Files" }
           "TERM_DIR=$($term.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
           Write-Host "TERM_DIR=$($term.FullName)"
-          Get-ChildItem $term.FullName | Select-Object Name
+
+      - name: First launch to populate data folder
+        shell: pwsh
+        run: |
+          $termExe = Join-Path $env:TERM_DIR "terminal64.exe"
+          Start-Process -FilePath $termExe
+          Start-Sleep -Seconds 30
+          Get-Process terminal64 -ErrorAction SilentlyContinue | Stop-Process -Force
+          Start-Sleep -Seconds 3
+          $base = Join-Path $env:APPDATA "MetaQuotes\Terminal"
+          $data = Get-ChildItem $base -Directory | Where-Object { Test-Path (Join-Path $_.FullName "MQL5") } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $data) { throw "terminal data folder not found under $base" }
+          "DATA_DIR=$($data.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "DATA_DIR=$($data.FullName)"
+          Get-ChildItem (Join-Path $data.FullName "MQL5") | Select-Object Name
 
       - name: Place EA source and compile
         shell: pwsh
         run: |
-          $experts = Join-Path $env:TERM_DIR "MQL5\Experts"
+          $experts = Join-Path $env:DATA_DIR "MQL5\Experts"
           New-Item -ItemType Directory -Force -Path $experts | Out-Null
           Copy-Item ".\PalmScalper.mq5" (Join-Path $experts "PalmScalper.mq5") -Force
           $me = Join-Path $env:TERM_DIR "metaeditor64.exe"
@@ -62,7 +76,7 @@ jobs:
           MT5_PASSWORD: ${{ secrets.MT5_PASSWORD }}
         run: |
           if (-not $env:MT5_LOGIN -or -not $env:MT5_PASSWORD) { throw "MT5_LOGIN / MT5_PASSWORD secrets are not set" }
-          $cfgDir = Join-Path $env:TERM_DIR "config"
+          $cfgDir = Join-Path $env:DATA_DIR "config"
           New-Item -ItemType Directory -Force -Path $cfgDir | Out-Null
           $ini = Join-Path $cfgDir "startup.ini"
           @"
@@ -75,7 +89,7 @@ jobs:
           Expert=PalmScalper
           "@ | Out-File -FilePath $ini -Encoding ascii
           $termExe = Join-Path $env:TERM_DIR "terminal64.exe"
-          Start-Process -FilePath $termExe -ArgumentList "/portable", "/config:`"$ini`""
+          Start-Process -FilePath $termExe -ArgumentList "/config:`"$ini`""
           Write-Host "terminal launched at $(Get-Date -Format o)"
 
       - name: Keep alive and stream logs
@@ -87,14 +101,7 @@ jobs:
           while ((Get-Date) -lt $deadline) {
             Start-Sleep -Seconds 300
             $i++
-            $stamp = Get-Date -Format "HHmmss"
-            $out = Join-Path $env:RUNNER_TEMP "snap-$stamp"
-            New-Item -ItemType Directory -Force -Path $out | Out-Null
-            $logs = Join-Path $env:TERM_DIR "Logs"
-            $mlogs = Join-Path $env:TERM_DIR "MQL5\Logs"
-            if (Test-Path $logs) { Copy-Item $logs (Join-Path $out "Logs") -Recurse -Force -ErrorAction SilentlyContinue }
-            if (Test-Path $mlogs) { Copy-Item $mlogs (Join-Path $out "MQL5Logs") -Recurse -Force -ErrorAction SilentlyContinue }
-            Write-Host "snapshot $i at $stamp"
+            Write-Host "snapshot $i at $(Get-Date -Format HH:mm:ss)"
           }
 
       - name: Upload terminal logs
@@ -103,6 +110,6 @@ jobs:
         with:
           name: mt5-logs
           path: |
-            ${{ env.TERM_DIR }}\Logs
-            ${{ env.TERM_DIR }}\MQL5\Logs
+            ${{ env.DATA_DIR }}\Logs
+            ${{ env.DATA_DIR }}\MQL5\Logs
           if-no-files-found: warn
