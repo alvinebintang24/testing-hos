@@ -1,0 +1,13 @@
+STATUS 2026-11-22 09:18:49 UTC
+== processes ==
+codespa+  181123  0.0  0.2  62028 37648 pts/0    S    08:41   0:00 /usr/bin/python3 /usr/bin/websockify --web=/usr/share/novnc/ 6080 localhost:5900
+codespa+  199123  6.2  1.2 14281260 199396 pts/0 Sl   09:15   0:13 C:\Program Files\MetaTrader 5\terminal64.exe
+codespa+  200195  3.4  1.1 13432396 189196 pts/0 Sl   09:17   0:03 C:\Program Files\Trade Set Go MT5 Terminal\terminal64.exe
+== listeners ==
+LISTEN 0      100          0.0.0.0:6080       0.0.0.0:*    users:(("python3",pid=181123,fd=3))    
+LISTEN 0      5            0.0.0.0:5900       0.0.0.0:*    users:(("Xtigervnc",pid=198671,fd=9))  
+LISTEN 0      5               [::]:5900          [::]:*    users:(("Xtigervnc",pid=198671,fd=10)) 
+== prefix /home/codespace/.mt5w ==
+data_dir: NOT FOUND
+== prefix /home/codespace/.mt5t ==
+data_dir: NOT FOUND
