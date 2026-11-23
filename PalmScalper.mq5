@@ -52,9 +52,17 @@
 //| accepts it — the accepted distance is discovered live, per       |
 //| entry. If no SL attaches, the position is closed at once: an     |
 //| unprotected position is never held. No broker TP on any symbol.  |
+//| v2.10: v2.09's first bare fill (SELL 1726.20, 03:34 WIB) raced   |
+//| the terminal — the deal completed ~1.4 s after the send, so the  |
+//| position lookup found nothing and the SL was never attached.     |
+//| Fixes: (1) after a fill, POLL up to 10 s for the position to      |
+//| appear before attaching; (2) an adopt pass runs in OnTick — any  |
+//| of our positions found with SL = 0 gets the ladder attach, so a  |
+//| position orphaned by any race protects itself within seconds;    |
+//| (3) the immediate entry never stacks while our position is open. |
 //+------------------------------------------------------------------+
 #property copyright "ticol"
-#property version   "2.09"
+#property version   "2.10"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -133,6 +141,8 @@ double SpreadCapPips()
 }
 
 // v2.06: entry stop distances that the broker will actually accept.
+bool OurPositionOpen(ulong &ticket, long &type, double &openPrice, datetime &openTime, double &sl); // defined below
+
 double EntrySLDist(const MqlTick &tick)
 {
    double need = (double)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL) * _Point
@@ -147,41 +157,12 @@ double EntryTPDist(const MqlTick &tick)
    return MathMax(InpSafetyTPPips * PipValue, need);
 }
 
-// v2.09: open at market with no stops, then ladder the SL on by modify.
-bool OpenWithSL(bool buy, double lot, string comment)
+// v2.09/v2.10: ladder the SL onto an open position until the broker
+// accepts a distance. Returns true once an SL is in place.
+bool AttachSLLadder(ulong posTicket, bool buy)
 {
-   bool sent = buy ? trade.Buy(lot, _Symbol, 0, 0, 0, comment)
-                   : trade.Sell(lot, _Symbol, 0, 0, 0, comment);
-   if(!sent)
-   {
-      PrintFormat("PalmScalper: open failed: %s", trade.ResultRetcodeDescription());
-      return false;
-   }
-   ulong posTicket = 0;
-   ulong deal = trade.ResultDeal();
-   if(deal > 0 && HistoryDealSelect(deal))
-      posTicket = (ulong)HistoryDealGetInteger(deal, DEAL_POSITION_ID);
-   if(posTicket == 0 || !PositionSelectByTicket(posTicket))
-   {
-      for(int i = PositionsTotal() - 1; i >= 0; i--)
-      {
-         ulong t = PositionGetTicket(i);
-         if(t > 0 && PositionGetInteger(POSITION_MAGIC) == InpMagic &&
-            PositionGetString(POSITION_SYMBOL) == _Symbol)
-         { posTicket = t; break; }
-      }
-   }
-   if(posTicket == 0)
-   {
-      Print("PalmScalper: open filled but position not found - cannot attach SL");
-      return false;
-   }
    MqlTick tick;
-   if(!SymbolInfoTick(_Symbol, tick))
-   {
-      trade.PositionClose(posTicket);
-      return false;
-   }
+   if(!SymbolInfoTick(_Symbol, tick)) return false;
    double dist0 = EntrySLDist(tick);
    for(int k = 0; k < 5; k++)
    {
@@ -195,9 +176,58 @@ bool OpenWithSL(bool buy, double lot, string comment)
          return true;
       }
    }
+   return false;
+}
+
+// v2.09: open at market with no stops, then attach the SL by modify.
+// v2.10: the fill can land ~1-2 s after the send on this broker, so
+// poll for the position to appear before attaching.
+bool OpenWithSL(bool buy, double lot, string comment)
+{
+   bool sent = buy ? trade.Buy(lot, _Symbol, 0, 0, 0, comment)
+                   : trade.Sell(lot, _Symbol, 0, 0, 0, comment);
+   if(!sent)
+   {
+      PrintFormat("PalmScalper: open failed: %s", trade.ResultRetcodeDescription());
+      return false;
+   }
+   ulong posTicket = 0;
+   for(int w = 0; w < 40 && posTicket == 0; w++)
+   {
+      ulong deal = trade.ResultDeal();
+      if(deal > 0 && HistoryDealSelect(deal))
+      {
+         ulong pt = (ulong)HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+         if(pt > 0 && PositionSelectByTicket(pt)) posTicket = pt;
+      }
+      if(posTicket == 0)
+      {
+         ulong t; long ty; double op; datetime ot; double osl;
+         if(OurPositionOpen(t, ty, op, ot, osl)) posTicket = t;
+      }
+      if(posTicket == 0) Sleep(250);
+   }
+   if(posTicket == 0)
+   {
+      Print("PalmScalper: fill not visible after 10 s - adopt pass will protect it");
+      return false;
+   }
+   if(AttachSLLadder(posTicket, buy)) return true;
    Print("PalmScalper: SL attach FAILED at every distance - closing position for safety");
    trade.PositionClose(posTicket);
    return false;
+}
+
+// v2.10: adopt pass — any of our positions sitting at SL = 0 gets the
+// ladder attach. Runs from OnTick, throttled by the caller.
+void AdoptUnprotected()
+{
+   ulong t; long ty; double op; datetime ot; double osl;
+   if(!OurPositionOpen(t, ty, op, ot, osl)) return;
+   if(osl != 0) return;
+   PrintFormat("PalmScalper: adopting unprotected position #%I64u - attaching SL", t);
+   if(!AttachSLLadder(t, ty == POSITION_TYPE_BUY))
+      Print("PalmScalper: adopt attach failed - will retry");
 }
 
 //+------------------------------------------------------------------+
@@ -602,6 +632,14 @@ void OnTick()
    MqlTick tick;
    if(!SymbolInfoTick(_Symbol, tick)) return;
 
+   // ---- v2.10 adopt pass: never leave our position without an SL ----
+   static datetime lastAdopt = 0;
+   if(TimeCurrent() - lastAdopt >= 15)
+   {
+      lastAdopt = TimeCurrent();
+      AdoptUnprotected();
+   }
+
    // ---- v2.02 profit kill switch (owner's rule) ----
    if(GlobalVariableCheck(GVKill) && GlobalVariableGet(GVKill) > 0.5)
       return; // killed at the profit target — stays off until a reset flag arrives
@@ -752,7 +790,9 @@ void OnTick()
       if(newBar || TimeCurrent() - LastImmTry >= 300)
       {
          LastImmTry = TimeCurrent();
-         if(!paper && !halted && !streakCooldown && TradesToday < InpMaxTradesPerDay &&
+         ulong aT; long aTy; double aP; datetime aTm; double aS;
+         bool havePos = OurPositionOpen(aT, aTy, aP, aTm, aS);
+         if(!havePos && !paper && !halted && !streakCooldown && TradesToday < InpMaxTradesPerDay &&
             dayPnL > -InpDailyLossLimit && !profitLocked &&
             spreadPips <= SpreadCapPips() && !InNewsWindow())
          {
