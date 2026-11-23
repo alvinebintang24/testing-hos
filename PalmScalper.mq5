@@ -44,9 +44,17 @@
 //| while the ±$1.6 TP of v2.06 filled. ETH entries now send NO      |
 //| broker TP at all; exits stay EA-led (checkpoint, blue-guard      |
 //| trailing, score flip, basket + equity stops), broker SL stays.   |
+//| v2.09: SL-only orders were STILL rejected (24 Nov 03:29–03:30) — |
+//| this broker's true minimum stop distance floats and the static   |
+//| SYMBOL_TRADE_STOPS_LEVEL under-reads it. Entries now open at     |
+//| market with NO stops, then the SL is attached by PositionModify  |
+//| in a widening ladder (x1.6, up to 5 tries) until the broker       |
+//| accepts it — the accepted distance is discovered live, per       |
+//| entry. If no SL attaches, the position is closed at once: an     |
+//| unprotected position is never held. No broker TP on any symbol.  |
 //+------------------------------------------------------------------+
 #property copyright "ticol"
-#property version   "2.08"
+#property version   "2.09"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -137,6 +145,59 @@ double EntryTPDist(const MqlTick &tick)
    double need = (double)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL) * _Point
                  + (tick.ask - tick.bid) + 2.0 * _Point;
    return MathMax(InpSafetyTPPips * PipValue, need);
+}
+
+// v2.09: open at market with no stops, then ladder the SL on by modify.
+bool OpenWithSL(bool buy, double lot, string comment)
+{
+   bool sent = buy ? trade.Buy(lot, _Symbol, 0, 0, 0, comment)
+                   : trade.Sell(lot, _Symbol, 0, 0, 0, comment);
+   if(!sent)
+   {
+      PrintFormat("PalmScalper: open failed: %s", trade.ResultRetcodeDescription());
+      return false;
+   }
+   ulong posTicket = 0;
+   ulong deal = trade.ResultDeal();
+   if(deal > 0 && HistoryDealSelect(deal))
+      posTicket = (ulong)HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+   if(posTicket == 0 || !PositionSelectByTicket(posTicket))
+   {
+      for(int i = PositionsTotal() - 1; i >= 0; i--)
+      {
+         ulong t = PositionGetTicket(i);
+         if(t > 0 && PositionGetInteger(POSITION_MAGIC) == InpMagic &&
+            PositionGetString(POSITION_SYMBOL) == _Symbol)
+         { posTicket = t; break; }
+      }
+   }
+   if(posTicket == 0)
+   {
+      Print("PalmScalper: open filled but position not found - cannot attach SL");
+      return false;
+   }
+   MqlTick tick;
+   if(!SymbolInfoTick(_Symbol, tick))
+   {
+      trade.PositionClose(posTicket);
+      return false;
+   }
+   double dist0 = EntrySLDist(tick);
+   for(int k = 0; k < 5; k++)
+   {
+      double dist = dist0 * MathPow(1.6, k);
+      if(!SymbolInfoTick(_Symbol, tick)) break;
+      double sl = buy ? NormalizeDouble(tick.bid - dist, _Digits)
+                      : NormalizeDouble(tick.ask + dist, _Digits);
+      if(trade.PositionModify(posTicket, sl, 0))
+      {
+         PrintFormat("PalmScalper: SL attached at distance %.2f (try %d)", dist, k + 1);
+         return true;
+      }
+   }
+   Print("PalmScalper: SL attach FAILED at every distance - closing position for safety");
+   trade.PositionClose(posTicket);
+   return false;
 }
 
 //+------------------------------------------------------------------+
@@ -699,22 +760,10 @@ void OnTick()
             if(dir == 0 && MathAbs(score) >= 3) dir = (score > 0) ? 1 : -1;
             if(dir != 0)
             {
-               double slDistI = EntrySLDist(tick);
-               double tpDistI = EntryTPDist(tick);
                double lotI = EffectiveLot();
-               bool okI = false;
-               if(dir > 0)
-               {
-                  double slI = NormalizeDouble(tick.ask - slDistI, _Digits);
-                  double tpI = (tpDistI > 0) ? NormalizeDouble(tick.ask + tpDistI, _Digits) : 0;
-                  okI = trade.Buy(lotI, _Symbol, tick.ask, slI, tpI, "PalmScalper immediate buy");
-               }
-               else
-               {
-                  double slI = NormalizeDouble(tick.bid + slDistI, _Digits);
-                  double tpI = (tpDistI > 0) ? NormalizeDouble(tick.bid - tpDistI, _Digits) : 0;
-                  okI = trade.Sell(lotI, _Symbol, tick.bid, slI, tpI, "PalmScalper immediate sell");
-               }
+               bool okI = OpenWithSL(dir > 0, lotI,
+                                     dir > 0 ? "PalmScalper immediate buy"
+                                             : "PalmScalper immediate sell");
                if(okI)
                {
                   TradesToday++;
@@ -762,27 +811,17 @@ void OnTick()
    if(CopyBuffer(hRSI, 0, 1, 1, rsiBuf) < 1) return;
    double rsiNow = rsiBuf[0];
 
-   double slDist = EntrySLDist(tick);
-   double tpDist = EntryTPDist(tick);
    double lot = EffectiveLot();
 
    if(score > 0 && rsiNow < InpRSIBuyMax)
    {
-      double sl = NormalizeDouble(tick.ask - slDist, _Digits);
-      double tp = (tpDist > 0) ? NormalizeDouble(tick.ask + tpDist, _Digits) : 0;
-      if(trade.Buy(lot, _Symbol, tick.ask, sl, tp, "PalmScalper buy"))
+      if(OpenWithSL(true, lot, "PalmScalper buy"))
          TradesToday++;
-      else
-         PrintFormat("PalmScalper: entry buy failed: %s", trade.ResultRetcodeDescription());
    }
    else if(score < 0 && rsiNow > InpRSISellMin)
    {
-      double sl = NormalizeDouble(tick.bid + slDist, _Digits);
-      double tp = (tpDist > 0) ? NormalizeDouble(tick.bid - tpDist, _Digits) : 0;
-      if(trade.Sell(lot, _Symbol, tick.bid, sl, tp, "PalmScalper sell"))
+      if(OpenWithSL(false, lot, "PalmScalper sell"))
          TradesToday++;
-      else
-         PrintFormat("PalmScalper: entry sell failed: %s", trade.ResultRetcodeDescription());
    }
 }
 //+------------------------------------------------------------------+
