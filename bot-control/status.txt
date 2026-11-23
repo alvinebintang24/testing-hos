@@ -1,46 +1,61 @@
-STATUS 2026-11-22 09:58:15 UTC
+STATUS 2026-11-23 19:53:37 UTC
 == processes ==
-codespa+  181123  0.0  0.2  62028 37648 pts/0    S    08:41   0:00 /usr/bin/python3 /usr/bin/websockify --web=/usr/share/novnc/ 6080 localhost:5900
-codespa+  225742  3.7  1.4 14219252 241680 pts/0 Sl   09:51   0:14 C:\Program Files\MetaTrader 5\terminal64.exe
 == listeners ==
-LISTEN 0      100          0.0.0.0:6080       0.0.0.0:*    users:(("python3",pid=181123,fd=3))    
-LISTEN 0      5            0.0.0.0:5900       0.0.0.0:*    users:(("Xtigervnc",pid=198671,fd=9))  
-LISTEN 0      5               [::]:5900          [::]:*    users:(("Xtigervnc",pid=198671,fd=10)) 
+no vnc listeners
 == prefix /home/codespace/.mt5w ==
 data_dir: /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5
-KF	0	09:15:11.162	Network	'42492': balance management has been enabled
-RR	0	09:35:11.215	Startup	successfully initialized from start config "Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini"
-GE	0	09:35:11.407	Terminal	MetaTrader 5 x64 build 6328 started for MetaQuotes Ltd.
-QL	0	09:35:11.408	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 13 / 15 Gb memory, 4 / 31 Gb disk, GMT+0
-EF	0	09:35:11.408	Terminal	C:\Program Files\MetaTrader 5
-HQ	0	09:35:11.408	Terminal	launched with Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini
-PG	0	09:35:11.427	MCP	started on 127.0.0.1:22346
-LQ	0	09:35:11.475	Compiler	full recompilation has been started
-FH	0	09:35:11.985	Compiler	full recompilation has been finished:  0 file(s) compiled
-IF	0	09:35:17.153	Experts	expert PalmScalper (BTCUSD,M5) loaded successfully
-RL	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud Asia 2: 10 gbit" found
-FE	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud USA 1: 10 gbit" found
-NP	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud Europe 2: 10 gbit" found
-IQ	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud USA 2: 10 gbit" found
-GD	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud Asia 1: 1 gbit" found
-CM	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud Europe 3: 10 gbit" found
-GK	0	09:35:44.769	Tester	MQL5 Cloud Server "MQL5 Cloud Europe 1: 10 gbit" found
-DR	2	09:40:27.177	Experts	initializing of PalmScalper (BTCUSD,M5) failed with code 0 (symbol synchronization timeout)
-DL	0	09:40:27.182	Experts	expert PalmScalper (BTCUSD,M5) removed
-QJ	0	09:47:39.510	Startup	successfully initialized from start config "Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini"
-QN	0	09:47:39.714	Terminal	MetaTrader 5 x64 build 6328 started for MetaQuotes Ltd.
-NE	0	09:47:39.714	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 13 / 15 Gb memory, 4 / 31 Gb disk, GMT+0
-RO	0	09:47:39.714	Terminal	C:\Program Files\MetaTrader 5
-CN	0	09:47:39.714	Terminal	launched with Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini
-JN	0	09:47:39.734	MCP	started on 127.0.0.1:22346
-PK	0	09:47:45.622	Experts	expert PalmScalper (BTCUSD,M5) loaded successfully
-KQ	0	09:51:44.319	Terminal	MetaTrader 5 x64 build 6328 started for MetaQuotes Ltd.
-IP	0	09:51:44.320	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 12 / 15 Gb memory, 4 / 31 Gb disk, GMT+0
-JR	0	09:51:44.320	Terminal	C:\Program Files\MetaTrader 5
-FE	0	09:51:44.340	MCP	started on 127.0.0.1:22346
+EG	0	11:32:32.608	Network	'42492': previous successful authorization performed from 158.140.182.46 on 2026.11.22 13:31:03
+KG	0	11:32:32.915	Network	'42492': terminal synchronized with Trade Set Go Ltd: 1 positions, 0 orders, 525 symbols, 0 spreads
+JD	0	11:32:32.915	Network	'42492': trading has been enabled - hedging mode
+LR	0	11:32:32.915	Network	'42492': balance management has been enabled
+NH	1	11:32:34.464	Network	'42492': connection to TradeSetGo-LiveTrade lost
+DL	0	11:32:35.538	Network	'42492': authorized on TradeSetGo-LiveTrade through Access Server LON2
+PO	0	11:32:35.538	Network	'42492': previous successful authorization performed from 23.97.62.129 on 2026.11.22 13:32:32
+DN	0	11:32:35.869	Network	'42492': terminal synchronized with Trade Set Go Ltd: 1 positions, 0 orders, 525 symbols, 0 spreads
+QM	0	11:32:35.869	Network	'42492': trading has been enabled - hedging mode
+CI	0	11:32:35.869	Network	'42492': balance management has been enabled
+FM	0	12:17:30.135	Trades	'42492': deal #283792 buy 0.1 ETHUSD. at 1722.97 done (based on order #260183)
+KI	0	12:25:28.379	Network	'42492': scanning network for access points
+RI	0	12:25:38.380	Network	'42492': scanning network finished
+LO	0	14:18:19.894	Terminal	MetaTrader 5 x64 build 6328 started for MetaQuotes Ltd.
+MJ	0	14:18:19.895	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 13 / 15 Gb memory, 3 / 31 Gb disk, GMT+0
+DH	0	14:18:19.895	Terminal	C:\Program Files\MetaTrader 5
+JN	0	14:18:19.918	MCP	started on 127.0.0.1:22346
+PE	0	14:18:23.969	Network	'42492': authorized on TradeSetGo-LiveTrade through Access Server LON2
+RG	0	14:18:23.969	Network	'42492': previous successful authorization performed from 158.140.182.46 on 2026.11.22 16:02:11
+EF	0	14:18:24.272	Network	'42492': terminal synchronized with Trade Set Go Ltd: 1 positions, 0 orders, 525 symbols, 0 spreads
+DE	0	14:18:24.272	Network	'42492': trading has been enabled - hedging mode
+RQ	0	14:18:24.272	Network	'42492': balance management has been enabled
+PF	0	14:41:34.477	Experts	expert PalmScalper (ETHUSD.,M5) loaded successfully
+PL	0	14:45:24.820	Trades	'42492': deal #284754 sell 0.1 ETHUSD. at 1713.23 done (based on order #260995)
+FR	0	14:45:33.426	Trades	'42492': deal #284755 sell 0.1 ETHUSD. at 1712.59 done (based on order #260996)
+CH	0	14:45:33.738	Trades	'42492': deal #284756 buy 0.1 ETHUSD. at 1712.85 done (based on order #260997)
+LD	0	14:45:52.264	Trades	'42492': deal #284818 sell 0.1 ETHUSD. at 1712.01 done (based on order #261061)
+EI	0	14:51:12.134	Experts	expert PalmScalper (ETHUSD.,M5) removed
+CN	0	14:51:12.147	Experts	expert PalmScalper (ETHUSD.,M5) loaded successfully
+FF	0	15:16:56.109	Experts	expert PalmScalper (XAUUSD.,M5) loaded successfully
 --- MQL5 log ---
 ﻿FQ	0	07:31:00.897	PalmScalper (BTCUSD.,M5)	PalmScalper: immediate entry skipped — a guard is active
 KK	0	08:23:58.731	Experts	automated trading is disabled
+MR	0	14:44:28.498	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry skipped — a guard is active
+RO	0	14:51:12.268	PalmScalper (ETHUSD.,M5)	PalmScalper v2.03: reset flag found — kill switch cleared, profit baseline re-set to current equity
+KR	0	14:51:58.786	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+CG	0	14:55:52.027	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+EK	0	15:01:18.025	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+IH	0	15:05:57.666	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+HM	0	15:11:23.731	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+OQ	0	15:16:03.232	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+QF	0	15:21:29.517	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+NJ	0	15:26:08.833	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+RO	0	15:30:48.328	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+IL	0	15:36:14.423	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+CP	0	15:40:54.228	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+CE	0	15:46:20.326	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+MJ	0	15:50:59.828	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+JN	0	15:56:26.209	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+ES	0	16:01:05.716	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+DG	0	16:06:31.922	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+PD	0	16:11:11.421	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
 == prefix /home/codespace/.mt5t ==
 data_dir: /home/codespace/.mt5t/drive_c/Program Files/Trade Set Go MT5 Terminal
 ﻿RP	0	08:14:46.092	Terminal	shutdown with 0
