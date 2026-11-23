@@ -39,9 +39,14 @@
 //| +$0.11 — before the 180 s bonus hold and long before the $5      |
 //| checkpoint (a $50 move at 0.10 lot). The backstop now sits       |
 //| beyond the checkpoint so exits stay checkpoint/trailing-led.     |
+//| v2.08: the broker ALSO caps TP distance from above — the $55     |
+//| TP was rejected "invalid stops" twice (24 Nov 03:23–03:25 WIB)   |
+//| while the ±$1.6 TP of v2.06 filled. ETH entries now send NO      |
+//| broker TP at all; exits stay EA-led (checkpoint, blue-guard      |
+//| trailing, score flip, basket + equity stops), broker SL stays.   |
 //+------------------------------------------------------------------+
 #property copyright "ticol"
-#property version   "2.07"
+#property version   "2.08"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -128,11 +133,10 @@ double EntrySLDist(const MqlTick &tick)
 }
 double EntryTPDist(const MqlTick &tick)
 {
+   if(StringFind(_Symbol, "ETH") >= 0) return 0.0; // v2.08: no broker TP on ETH
    double need = (double)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL) * _Point
                  + (tick.ask - tick.bid) + 2.0 * _Point;
-   double d = MathMax(InpSafetyTPPips * PipValue, need);
-   if(StringFind(_Symbol, "ETH") >= 0) d = MathMax(d, 55.0); // v2.07 (see header)
-   return d;
+   return MathMax(InpSafetyTPPips * PipValue, need);
 }
 
 //+------------------------------------------------------------------+
@@ -702,13 +706,13 @@ void OnTick()
                if(dir > 0)
                {
                   double slI = NormalizeDouble(tick.ask - slDistI, _Digits);
-                  double tpI = (InpSafetyTPPips > 0) ? NormalizeDouble(tick.ask + tpDistI, _Digits) : 0;
+                  double tpI = (tpDistI > 0) ? NormalizeDouble(tick.ask + tpDistI, _Digits) : 0;
                   okI = trade.Buy(lotI, _Symbol, tick.ask, slI, tpI, "PalmScalper immediate buy");
                }
                else
                {
                   double slI = NormalizeDouble(tick.bid + slDistI, _Digits);
-                  double tpI = (InpSafetyTPPips > 0) ? NormalizeDouble(tick.bid - tpDistI, _Digits) : 0;
+                  double tpI = (tpDistI > 0) ? NormalizeDouble(tick.bid - tpDistI, _Digits) : 0;
                   okI = trade.Sell(lotI, _Symbol, tick.bid, slI, tpI, "PalmScalper immediate sell");
                }
                if(okI)
@@ -765,16 +769,20 @@ void OnTick()
    if(score > 0 && rsiNow < InpRSIBuyMax)
    {
       double sl = NormalizeDouble(tick.ask - slDist, _Digits);
-      double tp = (InpSafetyTPPips > 0) ? NormalizeDouble(tick.ask + tpDist, _Digits) : 0;
+      double tp = (tpDist > 0) ? NormalizeDouble(tick.ask + tpDist, _Digits) : 0;
       if(trade.Buy(lot, _Symbol, tick.ask, sl, tp, "PalmScalper buy"))
          TradesToday++;
+      else
+         PrintFormat("PalmScalper: entry buy failed: %s", trade.ResultRetcodeDescription());
    }
    else if(score < 0 && rsiNow > InpRSISellMin)
    {
       double sl = NormalizeDouble(tick.bid + slDist, _Digits);
-      double tp = (InpSafetyTPPips > 0) ? NormalizeDouble(tick.bid - tpDist, _Digits) : 0;
+      double tp = (tpDist > 0) ? NormalizeDouble(tick.bid - tpDist, _Digits) : 0;
       if(trade.Sell(lot, _Symbol, tick.bid, sl, tp, "PalmScalper sell"))
          TradesToday++;
+      else
+         PrintFormat("PalmScalper: entry sell failed: %s", trade.ResultRetcodeDescription());
    }
 }
 //+------------------------------------------------------------------+
