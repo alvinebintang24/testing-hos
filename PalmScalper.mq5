@@ -25,9 +25,14 @@
 //| order actually fills — an attach while the market is closed no   |
 //| longer burns the one shot on a "market closed" rejection; the    |
 //| entry fires on the first live bar after the open instead.        |
+//| v2.05: symbol-aware spread cap. The 4-pip cap was calibrated     |
+//| for gold (1 pip = $0.10); on ETHUSD. 1 pip = $0.01, so 4 pips    |
+//| meant a $0.04 ceiling while the live broker spread is ±$0.22     |
+//| (22 pips, ±$0.02 real cost per 0.10-lot trade) — the guard       |
+//| blocked every ETH entry on 23–24 Nov. ETH cap is now 30 pips.    |
 //+------------------------------------------------------------------+
 #property copyright "ticol"
-#property version   "2.04"
+#property version   "2.05"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -96,6 +101,13 @@ double PipSize()
    if(StringFind(_Symbol, "BTC") >= 0) return 1.00;
    if(_Digits == 3 || _Digits == 5) return _Point * 10.0;
    return _Point;
+}
+
+// v2.05: effective spread cap for this symbol (see header note).
+double SpreadCapPips()
+{
+   if(StringFind(_Symbol, "ETH") >= 0) return 30.0;
+   return InpMaxSpreadPips;
 }
 
 //+------------------------------------------------------------------+
@@ -652,7 +664,7 @@ void OnTick()
          LastImmTry = TimeCurrent();
          if(!paper && !halted && !streakCooldown && TradesToday < InpMaxTradesPerDay &&
             dayPnL > -InpDailyLossLimit && !profitLocked &&
-            spreadPips <= InpMaxSpreadPips && !InNewsWindow())
+            spreadPips <= SpreadCapPips() && !InNewsWindow())
          {
             int dir = gate;
             if(dir == 0 && MathAbs(score) >= 3) dir = (score > 0) ? 1 : -1;
@@ -707,7 +719,7 @@ void OnTick()
    if(TradesToday >= InpMaxTradesPerDay) return;
    if(dayPnL <= -InpDailyLossLimit) return;
    if(profitLocked) return;
-   if(spreadPips > InpMaxSpreadPips) return;
+   if(spreadPips > SpreadCapPips()) return;
    if(InNewsWindow()) return;
    datetime lastClose = LastCloseTimeToday();
    if(lastClose > 0 && TimeCurrent() - lastClose < InpReenterCooldownSec) return;
