@@ -30,9 +30,13 @@
 //| meant a $0.04 ceiling while the live broker spread is ±$0.22     |
 //| (22 pips, ±$0.02 real cost per 0.10-lot trade) — the guard       |
 //| blocked every ETH entry on 23–24 Nov. ETH cap is now 30 pips.    |
+//| v2.06: entry SL/TP distances now clear the broker stop level     |
+//| AND the live spread. The 12-pip ETH stop ($0.12) sat inside      |
+//| the $0.22 spread, so the first v2.05 order was rejected with     |
+//| "invalid stops" (24 Nov 03:08 WIB).                              |
 //+------------------------------------------------------------------+
 #property copyright "ticol"
-#property version   "2.05"
+#property version   "2.06"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -108,6 +112,20 @@ double SpreadCapPips()
 {
    if(StringFind(_Symbol, "ETH") >= 0) return 30.0;
    return InpMaxSpreadPips;
+}
+
+// v2.06: entry stop distances that the broker will actually accept.
+double EntrySLDist(const MqlTick &tick)
+{
+   double need = (double)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL) * _Point
+                 + (tick.ask - tick.bid) + 2.0 * _Point;
+   return MathMax(InpStopLossPips * PipValue, need);
+}
+double EntryTPDist(const MqlTick &tick)
+{
+   double need = (double)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL) * _Point
+                 + (tick.ask - tick.bid) + 2.0 * _Point;
+   return MathMax(InpSafetyTPPips * PipValue, need);
 }
 
 //+------------------------------------------------------------------+
@@ -670,8 +688,8 @@ void OnTick()
             if(dir == 0 && MathAbs(score) >= 3) dir = (score > 0) ? 1 : -1;
             if(dir != 0)
             {
-               double slDistI = InpStopLossPips * PipValue;
-               double tpDistI = InpSafetyTPPips * PipValue;
+               double slDistI = EntrySLDist(tick);
+               double tpDistI = EntryTPDist(tick);
                double lotI = EffectiveLot();
                bool okI = false;
                if(dir > 0)
@@ -733,8 +751,8 @@ void OnTick()
    if(CopyBuffer(hRSI, 0, 1, 1, rsiBuf) < 1) return;
    double rsiNow = rsiBuf[0];
 
-   double slDist = InpStopLossPips * PipValue;
-   double tpDist = InpSafetyTPPips * PipValue;
+   double slDist = EntrySLDist(tick);
+   double tpDist = EntryTPDist(tick);
    double lot = EffectiveLot();
 
    if(score > 0 && rsiNow < InpRSIBuyMax)
