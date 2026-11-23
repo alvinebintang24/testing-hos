@@ -34,9 +34,14 @@
 //| AND the live spread. The 12-pip ETH stop ($0.12) sat inside      |
 //| the $0.22 spread, so the first v2.05 order was rejected with     |
 //| "invalid stops" (24 Nov 03:08 WIB).                              |
+//| v2.07: ETH safety TP floored at $55 of price. The v2.06 TP sat   |
+//| ±$1.5 away and closed the first live trade in 9 seconds for      |
+//| +$0.11 — before the 180 s bonus hold and long before the $5      |
+//| checkpoint (a $50 move at 0.10 lot). The backstop now sits       |
+//| beyond the checkpoint so exits stay checkpoint/trailing-led.     |
 //+------------------------------------------------------------------+
 #property copyright "ticol"
-#property version   "2.06"
+#property version   "2.07"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -125,7 +130,9 @@ double EntryTPDist(const MqlTick &tick)
 {
    double need = (double)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL) * _Point
                  + (tick.ask - tick.bid) + 2.0 * _Point;
-   return MathMax(InpSafetyTPPips * PipValue, need);
+   double d = MathMax(InpSafetyTPPips * PipValue, need);
+   if(StringFind(_Symbol, "ETH") >= 0) d = MathMax(d, 55.0); // v2.07 (see header)
+   return d;
 }
 
 //+------------------------------------------------------------------+
