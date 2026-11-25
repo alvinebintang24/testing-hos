@@ -1,2 +1,2 @@
-STATUS
-# 2026-11-24 03:00 WIB post-boot check
+ATTACH_OLD
+# 2026-11-25 11:52 WIB bot aktif - activate PalmScalper
