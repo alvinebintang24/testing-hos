@@ -1,61 +1,41 @@
-STATUS 2026-11-23 19:53:37 UTC
+STATUS 2026-11-25 04:51:29 UTC
 == processes ==
+codespa+   11275 16.5  1.4 14806420 229288 pts/0 Sl   04:48   0:27 C:\Program Files\MetaTrader 5\terminal64.exe
 == listeners ==
 no vnc listeners
 == prefix /home/codespace/.mt5w ==
 data_dir: /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5
-EG	0	11:32:32.608	Network	'42492': previous successful authorization performed from 158.140.182.46 on 2026.11.22 13:31:03
-KG	0	11:32:32.915	Network	'42492': terminal synchronized with Trade Set Go Ltd: 1 positions, 0 orders, 525 symbols, 0 spreads
-JD	0	11:32:32.915	Network	'42492': trading has been enabled - hedging mode
-LR	0	11:32:32.915	Network	'42492': balance management has been enabled
-NH	1	11:32:34.464	Network	'42492': connection to TradeSetGo-LiveTrade lost
-DL	0	11:32:35.538	Network	'42492': authorized on TradeSetGo-LiveTrade through Access Server LON2
-PO	0	11:32:35.538	Network	'42492': previous successful authorization performed from 23.97.62.129 on 2026.11.22 13:32:32
-DN	0	11:32:35.869	Network	'42492': terminal synchronized with Trade Set Go Ltd: 1 positions, 0 orders, 525 symbols, 0 spreads
-QM	0	11:32:35.869	Network	'42492': trading has been enabled - hedging mode
-CI	0	11:32:35.869	Network	'42492': balance management has been enabled
-FM	0	12:17:30.135	Trades	'42492': deal #283792 buy 0.1 ETHUSD. at 1722.97 done (based on order #260183)
-KI	0	12:25:28.379	Network	'42492': scanning network for access points
-RI	0	12:25:38.380	Network	'42492': scanning network finished
-LO	0	14:18:19.894	Terminal	MetaTrader 5 x64 build 6328 started for MetaQuotes Ltd.
-MJ	0	14:18:19.895	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 13 / 15 Gb memory, 3 / 31 Gb disk, GMT+0
-DH	0	14:18:19.895	Terminal	C:\Program Files\MetaTrader 5
-JN	0	14:18:19.918	MCP	started on 127.0.0.1:22346
-PE	0	14:18:23.969	Network	'42492': authorized on TradeSetGo-LiveTrade through Access Server LON2
-RG	0	14:18:23.969	Network	'42492': previous successful authorization performed from 158.140.182.46 on 2026.11.22 16:02:11
-EF	0	14:18:24.272	Network	'42492': terminal synchronized with Trade Set Go Ltd: 1 positions, 0 orders, 525 symbols, 0 spreads
-DE	0	14:18:24.272	Network	'42492': trading has been enabled - hedging mode
-RQ	0	14:18:24.272	Network	'42492': balance management has been enabled
-PF	0	14:41:34.477	Experts	expert PalmScalper (ETHUSD.,M5) loaded successfully
-PL	0	14:45:24.820	Trades	'42492': deal #284754 sell 0.1 ETHUSD. at 1713.23 done (based on order #260995)
-FR	0	14:45:33.426	Trades	'42492': deal #284755 sell 0.1 ETHUSD. at 1712.59 done (based on order #260996)
-CH	0	14:45:33.738	Trades	'42492': deal #284756 buy 0.1 ETHUSD. at 1712.85 done (based on order #260997)
-LD	0	14:45:52.264	Trades	'42492': deal #284818 sell 0.1 ETHUSD. at 1712.01 done (based on order #261061)
-EI	0	14:51:12.134	Experts	expert PalmScalper (ETHUSD.,M5) removed
-CN	0	14:51:12.147	Experts	expert PalmScalper (ETHUSD.,M5) loaded successfully
-FF	0	15:16:56.109	Experts	expert PalmScalper (XAUUSD.,M5) loaded successfully
+﻿RO	0	04:49:03.007	Terminal	MetaTrader 5 x64 build 6328 started for MetaQuotes Ltd.
+PK	0	04:49:03.007	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 13 / 15 Gb memory, 3 / 31 Gb disk, GMT+0
+MH	0	04:49:03.007	Terminal	C:\Program Files\MetaTrader 5
+PN	0	04:49:03.028	MCP	started on 127.0.0.1:22346
+JD	0	04:49:07.713	Network	'42492': authorized on TradeSetGo-LiveTrade through Access Server LD3 (ping: 198.97 ms, build 6230)
+OJ	0	04:49:07.713	Network	'42492': previous successful authorization performed from 82.158.131.0 on 2026.11.25 05:24:03
+OE	0	04:49:08.735	Network	'42492': terminal synchronized with Trade Set Go Ltd: 1 positions, 0 orders, 526 symbols, 0 spreads
+OF	0	04:49:08.735	Network	'42492': trading has been enabled - hedging mode
+EL	0	04:49:08.735	Network	'42492': balance management has been enabled
+DK	0	04:49:09.497	Network	'42492': scanning network for access points
+HR	0	04:49:09.933	Experts	expert PalmScalper (ETHUSD.,M5) loaded successfully
+MR	0	04:49:11.321	Trades	'42492': market sell 0.1 ETHUSD.
+CE	2	04:49:11.611	Trades	'42492': failed market sell 0.1 ETHUSD. [No money]
+FP	0	04:49:12.990	Trades	use MetaTrader VPS Hosting Service to speed up the execution: 0.13 ms via 'VPS London LD6 12' instead of 198.97 ms
+CR	0	04:49:19.460	Network	'42492': scanning network finished
+PJ	0	04:49:19.460	Network	'42492': auto connecting to a better access point with 74 % quality (previous: 67 %)
+DJ	1	04:49:19.461	Network	'42492': connection to TradeSetGo-LiveTrade lost
+PN	0	04:49:20.507	Network	'42492': authorized on TradeSetGo-LiveTrade through Access Server LON2 (ping: 156.22 ms, build 6230)
+HL	0	04:49:20.507	Network	'42492': previous successful authorization performed from 23.97.62.117 on 2026.11.25 06:49:07
+DO	0	04:49:20.765	Network	'42492': terminal synchronized with Trade Set Go Ltd: 1 positions, 0 orders, 526 symbols, 0 spreads
+PL	0	04:49:20.765	Network	'42492': trading has been enabled - hedging mode
+FK	0	04:49:20.765	Network	'42492': balance management has been enabled
+JN	0	04:50:00.179	Trades	'42492': market sell 0.1 ETHUSD.
+QF	2	04:50:00.336	Trades	'42492': failed market sell 0.1 ETHUSD. [No money]
 --- MQL5 log ---
-﻿FQ	0	07:31:00.897	PalmScalper (BTCUSD.,M5)	PalmScalper: immediate entry skipped — a guard is active
-KK	0	08:23:58.731	Experts	automated trading is disabled
-MR	0	14:44:28.498	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry skipped — a guard is active
-RO	0	14:51:12.268	PalmScalper (ETHUSD.,M5)	PalmScalper v2.03: reset flag found — kill switch cleared, profit baseline re-set to current equity
-KR	0	14:51:58.786	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-CG	0	14:55:52.027	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-EK	0	15:01:18.025	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-IH	0	15:05:57.666	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-HM	0	15:11:23.731	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-OQ	0	15:16:03.232	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-QF	0	15:21:29.517	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-NJ	0	15:26:08.833	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-RO	0	15:30:48.328	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-IL	0	15:36:14.423	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-CP	0	15:40:54.228	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-CE	0	15:46:20.326	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-MJ	0	15:50:59.828	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-JN	0	15:56:26.209	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-ES	0	16:01:05.716	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-DG	0	16:06:31.922	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
-PD	0	16:11:11.421	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry waiting — a guard is active
+﻿NO	0	04:49:11.612	PalmScalper (ETHUSD.,M5)	CTrade::OrderSend: market sell 0.10 ETHUSD. [not enough money]
+RJ	0	04:49:11.612	PalmScalper (ETHUSD.,M5)	PalmScalper: open failed: not enough money
+LG	0	04:49:11.612	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry order failed (will retry): not enough money
+EP	0	04:50:00.336	PalmScalper (ETHUSD.,M5)	CTrade::OrderSend: market sell 0.10 ETHUSD. [not enough money]
+NS	0	04:50:00.337	PalmScalper (ETHUSD.,M5)	PalmScalper: open failed: not enough money
+DH	0	04:50:00.337	PalmScalper (ETHUSD.,M5)	PalmScalper: immediate entry order failed (will retry): not enough money
 == prefix /home/codespace/.mt5t ==
 data_dir: /home/codespace/.mt5t/drive_c/Program Files/Trade Set Go MT5 Terminal
 ﻿RP	0	08:14:46.092	Terminal	shutdown with 0
