@@ -1,14 +1,11 @@
-STATUS 2026-11-25 04:51:29 UTC
+STATUS 2026-11-25 04:52:47 UTC
 == processes ==
-codespa+   11275 16.5  1.4 14806420 229288 pts/0 Sl   04:48   0:27 C:\Program Files\MetaTrader 5\terminal64.exe
+codespa+   13443  0.4  0.0 2685320 14092 pts/0   S    04:52   0:00 start.exe /exec /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5/terminal64.exe
+codespa+   13451 25.5  1.5 14939316 258472 pts/0 Sl   04:52   0:06 C:\Program Files\MetaTrader 5\terminal64.exe /config:Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini
 == listeners ==
 no vnc listeners
 == prefix /home/codespace/.mt5w ==
 data_dir: /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5
-﻿RO	0	04:49:03.007	Terminal	MetaTrader 5 x64 build 6328 started for MetaQuotes Ltd.
-PK	0	04:49:03.007	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 13 / 15 Gb memory, 3 / 31 Gb disk, GMT+0
-MH	0	04:49:03.007	Terminal	C:\Program Files\MetaTrader 5
-PN	0	04:49:03.028	MCP	started on 127.0.0.1:22346
 JD	0	04:49:07.713	Network	'42492': authorized on TradeSetGo-LiveTrade through Access Server LD3 (ping: 198.97 ms, build 6230)
 OJ	0	04:49:07.713	Network	'42492': previous successful authorization performed from 82.158.131.0 on 2026.11.25 05:24:03
 OE	0	04:49:08.735	Network	'42492': terminal synchronized with Trade Set Go Ltd: 1 positions, 0 orders, 526 symbols, 0 spreads
@@ -29,6 +26,16 @@ PL	0	04:49:20.765	Network	'42492': trading has been enabled - hedging mode
 FK	0	04:49:20.765	Network	'42492': balance management has been enabled
 JN	0	04:50:00.179	Trades	'42492': market sell 0.1 ETHUSD.
 QF	2	04:50:00.336	Trades	'42492': failed market sell 0.1 ETHUSD. [No money]
+HP	0	04:52:25.182	Startup	successfully initialized from start config "Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini"
+GP	0	04:52:25.369	Terminal	MetaTrader 5 x64 build 6328 started for MetaQuotes Ltd.
+QS	0	04:52:25.370	Terminal	Windows 11 build 22000 on Wine 11.22 Linux 6.8.0-1070-azure, 4 x AMD EPYC 7763 64-Core, AVX2, 13 / 15 Gb memory, 3 / 31 Gb disk, GMT+0
+PQ	0	04:52:25.370	Terminal	C:\Program Files\MetaTrader 5
+ED	0	04:52:25.370	Terminal	launched with Z:\home\codespace\.mt5w\drive_c\Program Files\MetaTrader 5\config\startup.ini
+CD	0	04:52:25.388	MCP	started on 127.0.0.1:22346
+PO	0	04:52:25.432	Compiler	full recompilation has been started
+RF	0	04:52:25.917	Compiler	full recompilation has been finished:  0 file(s) compiled
+DQ	0	04:52:30.582	Experts	expert PalmScalper (ETHUSD.,M5) loaded successfully
+QI	0	04:52:32.772	Experts	expert PalmScalper (BTCUSD,M5) loaded successfully
 --- MQL5 log ---
 ﻿NO	0	04:49:11.612	PalmScalper (ETHUSD.,M5)	CTrade::OrderSend: market sell 0.10 ETHUSD. [not enough money]
 RJ	0	04:49:11.612	PalmScalper (ETHUSD.,M5)	PalmScalper: open failed: not enough money

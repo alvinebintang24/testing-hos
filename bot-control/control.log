@@ -16,3 +16,8 @@
 [19:53:37] executing: STATUS
 [04:51:27] mt5-control started in /workspaces/testing-hos
 [04:51:29] executing: STATUS
+[04:51:32] status pushed
+[04:52:19] executing: ATTACH_OLD
+[04:52:19] EA copied to old Experts
+[04:52:19] reset flag dropped for old
+[04:52:22] launched Program Files/MetaTrader 5/terminal64.exe with /home/codespace/.mt5w/drive_c/Program Files/MetaTrader 5/config/startup.ini
